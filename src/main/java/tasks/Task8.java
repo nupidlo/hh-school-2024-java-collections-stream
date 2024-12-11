@@ -4,8 +4,15 @@ import common.Person;
 import common.PersonService;
 import common.PersonWithResumes;
 import common.Resume;
+
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /*
   Еще один вариант задачи обогащения
@@ -21,7 +28,28 @@ public class Task8 {
   }
 
   public Set<PersonWithResumes> enrichPersonsWithResumes(Collection<Person> persons) {
-    Set<Resume> resumes = personService.findResumes(Set.of());
-    return Set.of();
+    // Словарь для быстрого поиска персоны по ее id
+    Map<Integer, Person> personsById = persons.stream()
+        .collect(Collectors.toMap(Person::id, Function.identity()));
+
+    // Получаем сет резюме для всех персон
+    Set<Resume> resumes = personService.findResumes(persons.stream().map(Person::id).toList());
+
+    // Группируем резюме по id персоны
+    Map<Integer, List<Resume>> personResumes = resumes.stream()
+        .collect(Collectors.groupingBy(Resume::personId));
+    // Добавляем в словарь персон без резюме
+    for (Integer id : personsById.keySet()) {
+      if (!personResumes.containsKey(id)) {
+        personResumes.put(id, Collections.emptyList());
+      }
+    }
+
+    // Делаем сет требуемых объектов из словаря
+    return personResumes.entrySet().stream()
+        .map(entry -> new PersonWithResumes(
+            personsById.get(entry.getKey()),
+            new HashSet<>(entry.getValue())))
+        .collect(Collectors.toSet());
   }
 }
