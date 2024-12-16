@@ -63,6 +63,22 @@ public class Task9Test {
   }
 
   @Test
+  public void getPersonNamesTestEmpty() {
+    assertEquals(
+        Collections.emptyMap(),
+        task.getPersonNames(Collections.emptyList())
+    );
+  }
+
+  @Test
+  public void getPersonNamesTestDuplicates() {
+    assertEquals(
+        Map.of(2, "Petrov Vasya"),
+        task.getPersonNames(List.of(person2, person2))
+    );
+  }
+
+  @Test
   public void hasSamePersonsTest() {
     assertTrue(task.hasSamePersons(List.of(person1, person2), List.of(person2, person3)));
     assertFalse(task.hasSamePersons(List.of(person1, person2), List.of(person4, person3)));

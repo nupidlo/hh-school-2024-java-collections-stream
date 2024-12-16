@@ -4,9 +4,9 @@ import common.Area;
 import common.Person;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /*
@@ -18,19 +18,24 @@ import java.util.stream.Collectors;
  */
 public class Task6 {
 
+  // Метод для склейки строки
+  public static String personAndAreaToString(Person person, Area area) {
+    return person.firstName() + " - " + area.getName();
+  }
+
   public static Set<String> getPersonDescriptions(Collection<Person> persons,
                                                   Map<Integer, Set<Integer>> personAreaIds,
                                                   Collection<Area> areas) {
-    // Словарь для поиска Area.Name по Area.Id за О(1)
-    Map<Integer, String> areasMap = areas.stream()
+    // Словарь для поиска Area по id
+    Map<Integer, Area> areasMap = areas.stream()
         .collect(Collectors.toMap(
             Area::getId,
-            Area::getName
+            Function.identity()
         ));
-    return new HashSet<>(persons).stream()
-        .flatMap(p -> personAreaIds.get(p.id())
+    return persons.stream()
+        .flatMap(person -> personAreaIds.get(person.id())
             .stream()
-            .map(areaId -> p.firstName() + " - " + areasMap.get(areaId)))
+            .map(areaId -> personAndAreaToString(person, areasMap.get(areaId))))
         .collect(Collectors.toSet());
   }
 }

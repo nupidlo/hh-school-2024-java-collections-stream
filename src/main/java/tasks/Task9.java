@@ -49,13 +49,14 @@ public class Task9 {
   // словарь id персоны -> ее имя
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
     // Можно написать в одну строчку
-    return persons.stream().collect(Collectors.toMap(Person::id, this::convertPersonToString));
+    return persons.stream().distinct().collect(Collectors.toMap(Person::id, this::convertPersonToString));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
-    // Быстрое решение в одну строку
-    return !Collections.disjoint(persons1, persons2);
+    HashSet<Person> personSet1 = new HashSet<>(persons1);
+    HashSet<Person> personSet2 = new HashSet<>(persons2);
+    return !Collections.disjoint(personSet1, personSet2);
   }
 
   // Посчитать число четных чисел

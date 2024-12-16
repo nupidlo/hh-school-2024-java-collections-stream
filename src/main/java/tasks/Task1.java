@@ -3,10 +3,10 @@ package tasks;
 import common.Person;
 import common.PersonService;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /*
 Задача 1
@@ -23,13 +23,11 @@ public class Task1 {
     this.personService = personService;
   }
 
-  /* Comparator сортирует за O(n * log(n)). Предполагаю, что findPersons тоже работает не дольше, чем O(n * log(n))
-  * (а скорее всего, за O(n)). Лист создается за линейное время.
-  * Следовательно, время работы всей функции - O(n * log(n)). */
+  /* Тогда вот так: за O(n) получаем сет из сервиса, за O(n) пересобираем его в словарь.
+  * Далее за O(n) перегоняем лист айдишников в лист персон. Итого O(n). */
   public List<Person> findOrderedPersons(List<Integer> personIds) {
-    Set<Person> persons = personService.findPersons(personIds);
-    List<Person> sortedPersons = new ArrayList<>(persons);
-    sortedPersons.sort(Comparator.comparing(person -> personIds.indexOf(person.id())));
-    return sortedPersons;
+    Map<Integer, Person> personsByIds = personService.findPersons(personIds).stream()
+        .collect(Collectors.toMap(Person::id, Function.identity()));
+    return personIds.stream().map(personsByIds::get).toList();
   }
 }
